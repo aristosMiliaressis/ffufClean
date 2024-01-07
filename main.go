@@ -38,17 +38,16 @@ func HasFalsePositivePrefix(allResults []JsonResult, curResult JsonResult) bool 
 		clusteredResults[key] = append(clusteredResults[key], result)
 	}
 
-	for _, resultCluster := range clusteredResults {
+	key := fmt.Sprintf("%d,%d", curResult.StatusCode, curResult.ContentWords)
 
-		for _, result := range resultCluster {
-			if len(string(result.Input["FUZZ"])) < 2 {
-				continue
-			}
-			prefixedResults[string(result.Input["FUZZ"])[0:2]] = append(prefixedResults[string(result.Input["FUZZ"])[0:2]], result)
+	for _, result := range clusteredResults[key] {
+		if len(string(result.Input["FUZZ"])) < 2 {
+			continue
 		}
+		prefixedResults[string(result.Input["FUZZ"])[0:2]] = append(prefixedResults[string(result.Input["FUZZ"])[0:2]], result)
 	}
 
-	if len(prefixedResults[string(curResult.Input["FUZZ"])[0:2]]) > 2 {
+	if len(prefixedResults[string(curResult.Input["FUZZ"])[0:2]]) > 1 {
 		for _, r := range prefixedResults[string(curResult.Input["FUZZ"])[0:2]] {
 			if len(curResult.Input["FUZZ"]) > len(r.Input["FUZZ"]) {
 				return true
