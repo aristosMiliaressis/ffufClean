@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -41,15 +42,18 @@ func HasFalsePositivePrefix(allResults []JsonResult, curResult JsonResult) bool 
 	key := fmt.Sprintf("%d,%d", curResult.StatusCode, curResult.ContentWords)
 
 	for _, result := range clusteredResults[key] {
-		if len(string(result.Input["FUZZ"])) < 2 {
+		path := strings.SplitN(result.Url, result.Host, 2)[1]
+		if len(path) < 2 {
 			continue
 		}
-		prefixedResults[string(result.Input["FUZZ"])[0:2]] = append(prefixedResults[string(result.Input["FUZZ"])[0:2]], result)
+		prefixedResults[path[0:2]] = append(prefixedResults[path[0:2]], result)
 	}
 
-	if len(prefixedResults[string(curResult.Input["FUZZ"])[0:2]]) > 1 {
-		for _, r := range prefixedResults[string(curResult.Input["FUZZ"])[0:2]] {
-			if len(curResult.Input["FUZZ"]) > len(r.Input["FUZZ"]) {
+	curPath := strings.SplitN(curResult.Url, curResult.Host, 2)[1]
+	if len(prefixedResults[string(curPath)[0:2]]) > 1 {
+		for _, r := range prefixedResults[curPath[0:2]] {
+			rPath := strings.SplitN(r.Url, r.Host, 2)[1]
+			if len(curPath) > len(rPath) {
 				return true
 			}
 		}
