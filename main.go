@@ -27,7 +27,9 @@ func main() {
 	}
 
 	resultJsonBytes, _ := json.Marshal(cleanResults)
-	fmt.Println(string(resultJsonBytes))
+	if resultJsonBytes != nil {
+		fmt.Println(string(resultJsonBytes))
+	}
 }
 
 func HasFalsePositivePrefix(allResults []JsonResult, curResult JsonResult) bool {
@@ -54,6 +56,7 @@ func HasFalsePositivePrefix(allResults []JsonResult, curResult JsonResult) bool 
 		for _, r := range prefixedResults[curPath[0:2]] {
 			rPath := strings.SplitN(r.Url, r.Host, 2)[1]
 			if len(curPath) > len(rPath) {
+				fmt.Fprintf(os.Stderr, "%s is false positve", curResult.Url)
 				return true
 			}
 		}
